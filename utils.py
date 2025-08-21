@@ -27,7 +27,6 @@ for row in sheet.iter_rows(min_row=2, max_col=2, values_only=True):
     if row[1]:  
         article_list.append(row[1])
 
-# print(article_list)
 
 url = 'http://195.158.30.91/ONECOMPUTERS/hs/item/getdata'
 headers = {'Content-Type': 'application/json'}
@@ -41,7 +40,6 @@ if response.status_code == 200:
         item = product['Товар']
         price = product['Цена']
         remainder = product['Остатка']  
-        print(price)
         clean_price = clean_number(str(price))            
         models.Product.objects.update_or_create(
             item=item,
