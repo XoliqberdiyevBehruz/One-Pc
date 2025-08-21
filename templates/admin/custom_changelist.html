@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+        <!-- <div style="margin-right: 240px; background-color: #f5f5f5; padding: 10px; border-radius: 6px;">
+            <a style="font-weight: 900; font-size:large; margin-left: 15px; color: black;">Barcha mahsulotlar: <span style="color: red;">{{ product_count }}</span></a>
+            <a style="font-weight: 900; font-size:large; margin-left: 15px; color: black;">Rasmi bor: <span style="color: red;">{{ product_with_image }}</span> </a>
+            <a style="font-weight: 900; font-size:large; margin-left: 15px; color: black;">Rasmi yo‘q: <span style="color: red;">{{ product_without_image }}</span></a>
+        </div> -->
+    {{ block.super }}
+    <div style="margin-left: 10px;">
+        <a href="{% url 'admin:update_data' %}" class="btn btn-primary">
+            <i class="fas fa-sync"></i> Ma'lumotlarni yangilash
+        </a>
+    </div>
+{% endblock %}

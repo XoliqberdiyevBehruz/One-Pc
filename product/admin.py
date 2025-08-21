@@ -1,7 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.urls import path
+from django.shortcuts import redirect
+
 from modeltranslation.admin import TranslationAdmin, TranslationStackedInline
 
 from product import models, forms
+from product.utils import create_or_update_products
 
 
 class ProductMediasInline(admin.StackedInline):
@@ -53,6 +57,24 @@ class ProductAdmin(TranslationAdmin):
     list_editable = ['name_uz', 'name_ru', 'name_en', 'category', 'main_image']
     search_fields = ('item', 'name_uz', 'name_ru', 'name_en')
     list_filter = ['category'] 
+    actions = ['delete_all']
+    change_list_template = "admin/custom_changelist.html"
+
+    @admin.action(description="Delete all products")
+    def delete_all(self, request, queryset):
+        models.Product.objects.all().delete()
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('admin/product/product/', self.update_data, name='update_data'),
+        ]
+        return custom_urls + urls
+
+    def update_data(self, request):
+        res = create_or_update_products()
+        messages.success(request, res)
+        return redirect("admin:product_product_changelist")  
 
 
 @admin.register(models.ProductCategory)
