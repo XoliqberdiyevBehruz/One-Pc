@@ -1,21 +1,42 @@
 import requests
-from concurrent.futures import ProcessPoolExecutor
-from django.db import transaction
+import pandas as pd
+
 from product import models
+from common.models import ExcelFile
 
 
-def process_chunk(chunk):
-    """Bitta bo‘lakdagi mahsulotlarni DB ga yozish."""
-    created_count = 0
-    count = 0
+def create_or_update_products():
+    # Excel fayldan artikllarni olish
+    artickles = []
+    excel_file = ExcelFile.objects.first().file
+    if excel_file:
+        df = pd.read_excel(excel_file.path, dtype=str)
+        artickles = df['Artikle'].astype(str).tolist()
 
-    for product in chunk:
-        count += 1
-        item = product['article']
-        price = product['price']
-        category_name = product['category']
+    # API dan ma'lumot olish
+    url = 'http://195.158.30.91/ONECOMPUTERS/hs/item/getdata'
+    response = requests.get(url, auth=('HttpUser', '85!@fdfd$DES35wgf&%'))
 
-        if category_name or category_name != "":
+    if response.status_code != 200:
+        return "API dan ma'lumot olinmadi"
+
+    data = response.json().get("data", [])
+    total_created = 0
+    total_processed = 0
+
+    # Barcha mahsulotlarni qayta ishlash
+    for product in data:
+        total_processed += 1
+        item = str(product['article'])
+
+        # Excelda mavjud bo‘lmagan artikllarni tashlab ketamiz
+        if item not in artickles:
+            continue
+
+        price = product.get('price')
+        category_name = product.get('category')
+
+        if category_name and category_name.strip():
             category, _ = models.ProductCategory.objects.get_or_create(
                 name="".join((category_name.split(". ", 1)[1:]))
             )
@@ -38,35 +59,6 @@ def process_chunk(chunk):
             }
         )
         if created:
-            created_count += 1
+            total_created += 1
 
-    return created_count, count
-
-
-def create_or_update_products():
-    url = 'http://195.158.30.91/ONECOMPUTERS/hs/item/getdata'
-    response = requests.get(url, auth=('HttpUser', '85!@fdfd$DES35wgf&%'))
-
-    if response.status_code != 200:
-        return "API dan ma'lumot olinmadi"
-
-    data = response.json().get("data", [])
-    total_count = len(data)
-
-    # Ma’lumotni 4 ta bo‘lakka bo‘lamiz (CPU core soniga qarab oshirish mumkin)
-    chunk_size = max(1, total_count // 4)
-    chunks = [data[i:i + chunk_size] for i in range(0, total_count, chunk_size)]
-
-    total_created = 0
-    total_processed = 0
-
-    # Parallel ishlatamiz
-    with ProcessPoolExecutor(max_workers=4) as executor:
-        results = executor.map(process_chunk, chunks)
-
-    # Natijalarni yig‘amiz
-    for created_count, count in results:
-        total_created += created_count
-        total_processed += count
-
-    return f"{total_created}ta maxsulot qoshildi va {total_processed}ta maxsulot yangilandi"
+    return f"{total_created} ta mahsulot qo'shildi va {total_processed} ta mahsulot yangilandi"

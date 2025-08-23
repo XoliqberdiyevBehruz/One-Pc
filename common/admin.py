@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from common import models
 
@@ -29,3 +31,18 @@ class ContactUsAdmin(admin.ModelAdmin):
     list_display = ['name', 'phone_number', 'is_contacted']
     list_display_links = list_display
     list_filter = ['is_contacted']
+
+
+@admin.register(models.ExcelFile)
+class ExcelFileAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return not models.ExcelFile.objects.exists()
+
+    def changelist_view(self, request, extra_context=None):
+        config, created = models.ExcelFile.objects.get_or_create(
+            defaults=dict(
+                file=''
+            )
+        )
+        url = reverse("admin:common_excelfile_change", args=[config.id])
+        return HttpResponseRedirect(url)

@@ -1,12 +1,10 @@
-import uuid
-
 from django.db import models
 from django.db.models import CharField
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import FileExtensionValidator
 
 
 class BaseModel(models.Model):
-    # uuid = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -53,3 +51,14 @@ class AboutUs(BaseModel):
     class Meta:
         verbose_name = _('About Us')
         verbose_name_plural = _('About Us')
+
+
+class ExcelFile(models.Model):
+    file = models.FileField(
+        upload_to='excel_file/',
+        validators=[FileExtensionValidator(allowed_extensions=['xlsx', 'xls'])]    
+    )
+
+    class Meta:
+        verbose_name = 'Excel File'
+        verbose_name_plural = 'Excel File'
