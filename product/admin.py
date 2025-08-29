@@ -76,6 +76,17 @@ class ProductAdmin(TranslationAdmin):
         messages.success(request, res)
         return redirect("admin:product_product_changelist")  
 
+    def changelist_view(self, request, extra_context=None):
+        products = models.Product.objects.all()
+        product_count = products.count()
+        product_with_image = products.filter(main_image__isnull=False).exclude(main_image='').count()
+        product_without_image = product_count - product_with_image
+        extra_context = extra_context or {}
+        extra_context['product_count'] = product_count
+        extra_context['product_without_image'] = product_without_image
+        extra_context['product_with_image'] = product_with_image
+        return super().changelist_view(request, extra_context=extra_context)
+
 
 @admin.register(models.ProductCategory)
 class ProductCategoryAdmin(TranslationAdmin):
