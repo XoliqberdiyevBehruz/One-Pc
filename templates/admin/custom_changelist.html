@@ -1,15 +1,27 @@
 {% extends "admin/change_list.html" %}
 
 {% block object-tools %}
-        <div style="margin-right: 240px; background-color: #f5f5f5; padding: 10px; border-radius: 6px;">
-            <a style="font-weight: 900; font-size:large; margin-left: 15px; color: black;">Barcha mahsulotlar: <span style="color: red;">{{ product_count }}</span></a>
-            <a style="font-weight: 900; font-size:large; margin-left: 15px; color: black;">Rasmi bor: <span style="color: red;">{{ product_with_image }}</span> </a>
-            <a style="font-weight: 900; font-size:large; margin-left: 15px; color: black;">Rasmi yo‘q: <span style="color: red;">{{ product_without_image }}</span></a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+
+        <!-- Ortada statistikalar -->
+        <div style="flex: 1; text-align: center; background-color: #f5f5f5; padding-right: 190px; border-radius: 6px;">
+            <span style="font-weight: 900; font-size: large; margin: 0 10px; color: black;">
+                Barcha mahsulotlar: <span style="color: red;">{{ product_count }}</span>
+            </span>
+            <span style="font-weight: 900; font-size: large; margin: 0 10px; color: black;">
+                Rasmi bor: <span style="color: red;">{{ product_with_image }}</span>
+            </span>
+            <span style="font-weight: 900; font-size: large; margin: 0 10px; color: black;">
+                Rasmi yo‘q: <span style="color: red;">{{ product_without_image }}</span>
+            </span>
         </div>
-    {{ block.super }}
-    <div style="margin-left: 10px;">
-        <a href="{% url 'admin:update_data' %}" class="btn btn-primary">
-            <i class="fas fa-sync"></i> Ma'lumotlarni yangilash
-        </a>
+
+        <!-- O‘ng tomonda tugmalar -->
+        <div style="display: flex; gap: 10px; margin-left: auto;">
+            {{ block.super }}
+            <a href="{% url 'admin:update_data' %}" class="btn btn-primary">
+                <i class="fas fa-sync"></i> Ma'lumotlarni yangilash
+            </a>
+        </div>
     </div>
 {% endblock %}
