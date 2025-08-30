@@ -125,10 +125,10 @@ USE_I18N = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
-if DEBUG:
-    STATICFILES_DIRS = [
-        BASE_DIR / "static",   # umumiy static papka
-    ]
+# if DEBUG:
+#     STATICFILES_DIRS = [
+#         BASE_DIR / "static",   # umumiy static papka
+#     ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
