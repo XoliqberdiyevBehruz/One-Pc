@@ -57,23 +57,23 @@ class ProductAdmin(TranslationAdmin):
     list_editable = ['name_uz', 'name_ru', 'name_en', 'category', 'main_image']
     search_fields = ('item', 'name_uz', 'name_ru', 'name_en')
     list_filter = ['category'] 
-    actions = ['delete_all']
+    # actions = ['delete_all']
     change_list_template = "admin/custom_changelist.html"
 
-    @admin.action(description="Delete all products")
-    def delete_all(self, request, queryset):
-        models.Product.objects.all().delete()
+    # @admin.action(description="Delete all products")
+    # def delete_all(self, request, queryset):
+    #     models.Product.objects.all().delete()
     
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            path('admin/product/product/', self.update_data, name='update_data'),
+            path('admin/product/product/', self.delete_product, name='delete_product'),
         ]
         return custom_urls + urls
 
-    def update_data(self, request):
-        res = create_or_update_products()
-        messages.success(request, res)
+    def delete_product(self, request):
+        count, _ = models.Product.objects.exclude(category__isnull=False).delete()
+        messages.success(request, f"{count}ta mahsulot o'chirildi")
         return redirect("admin:product_product_changelist")  
 
     def changelist_view(self, request, extra_context=None):
