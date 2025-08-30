@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.urls import path
 from django.shortcuts import redirect
+from django.template.response import TemplateResponse
 
 from modeltranslation.admin import TranslationAdmin, TranslationStackedInline
 
@@ -72,9 +73,20 @@ class ProductAdmin(TranslationAdmin):
         return custom_urls + urls
 
     def delete_product(self, request):
-        count, _ = models.Product.objects.exclude(category__isnull=False).delete()
-        messages.success(request, f"{count}ta mahsulot o'chirildi")
-        return redirect("admin:product_product_changelist")  
+        if request.method == "POST":
+            products = models.Product.objects.filter(category__isnull=True)
+            count = products.count()
+            products.delete()
+            messages.success(request, f"{count} ta brandi yo‘q mahsulot o‘chirildi.")
+            return redirect("admin:product_product_changelist")
+
+        products = models.Product.objects.filter(category__isnull=True)
+        context = {
+            **self.admin_site.each_context(request),
+            "opts": self.model._meta,
+            "products": products,
+        }
+        return TemplateResponse(request, "admin/confirm_deleted_products.html", context)
 
     def changelist_view(self, request, extra_context=None):
         products = models.Product.objects.all()

@@ -1,0 +1,54 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="card" style="padding: 20px; border-radius: 8px; background: #fff; box-shadow: 0 2px 6px #0000001a; width: 100%;">
+
+    <h2 style="margin-bottom: 20px; color: #b71c1c;">
+        🗑 Kategoriyasi yo‘q mahsulotlarni o‘chirish
+    </h2>
+
+    <p style="font-size: 16px; margin-bottom: 20px;">
+        Quyidagi mahsulotlar <strong>butunlay o‘chirilsinmi?</strong>
+    </p>
+
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-2">
+                <div class="card mb-3 shadow-sm" style="border-radius: 10px;">
+                    
+                    {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" class="card-img-top" alt="{{ product.name_uz }}"
+                             style="height:150px; object-fit:cover; border-top-left-radius:10px; border-top-right-radius:10px;">
+                    {% else %}
+                        <img src="{% static 'admin/image/no_image.jpg' %}" class="card-img-top"
+                             style="height:150px; object-fit:cover; border-top-left-radius:10px; border-top-right-radius:10px;">
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h6 class="card-title">{{ product.name_uz }}</h6>
+                        <p class="card-text">
+                            <small class="text-muted">Item: {{ product.item }}</small><br>
+                            <small class="text-muted">Narxi: {{ product.price }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted">O‘chiriladigan mahsulot yo‘q</p>
+        {% endfor %}
+    </div>
+
+    <div style="margin-top: 20px;">
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                Tasdiqlash
+            </button>
+        </form>
+        <a href="{% url 'admin:product_product_changelist' %}" class="btn btn-secondary">
+            Bekor qilish
+        </a>
+    </div>
+</div>
+{% endblock %}
