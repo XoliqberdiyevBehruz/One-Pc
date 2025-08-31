@@ -41,8 +41,8 @@ def create_or_update_products():
                 name="".join((category_name.split(". ", 1)[1:]))
             )
         else:
-            category, _ = models.ProductCategory.objects.get_or_create(name='Boshqa')
-
+            continue
+        
         brand = None
         if product.get('brend'):
             brand, _ = models.ProductBrand.objects.get_or_create(name=product.get('brend'))
